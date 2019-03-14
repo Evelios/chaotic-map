@@ -7,7 +7,7 @@
   // Algorithm Sources
   // http://www.complexity-explorables.org/explorables/levy/
 
-  function levyFlight(dimensions, density, rng=Math.random, num_points=10) {
+  function levyFlight(dimensions, num_points=10, rng=Math.random) {
     const seed_point = rngInBox(dimensions, rng);
 
     let out_points = [seed_point];
@@ -22,7 +22,6 @@
       num_points--;
     }
 
-    console.log(out_points);
     return out_points;
   }
 

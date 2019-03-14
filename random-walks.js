@@ -1,7 +1,7 @@
 // Algorithm Sources
 // http://www.complexity-explorables.org/explorables/levy/
 
-export default function levyFlight(dimensions, density, rng=Math.random, num_points=10) {
+export default function levyFlight(dimensions, num_points=10, rng=Math.random) {
   const density_fn = density instanceof Function ? density : () => density;
   const [width, height] = dimensions;
   const seed_point = rngInBox(dimensions, rng);
@@ -18,7 +18,6 @@ export default function levyFlight(dimensions, density, rng=Math.random, num_poi
     num_points--;
   }
 
-  console.log(out_points)
   return out_points;
 }
 
