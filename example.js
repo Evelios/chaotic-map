@@ -77,7 +77,7 @@ function create() {
         }
     };
 
-    points = poisson(bbox, densityFunction[params.distribution], rng);
+    points = randomWalks(bbox, densityFunction[params.distribution], rng);
     points = points.map(vec => {
         const jitter = params.jitter * densityFunction[params.distribution](vec);
         const angle = 2*Math.PI * rng();

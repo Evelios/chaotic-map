@@ -8,14 +8,14 @@ const plugins = [
 
 export default {
   plugins,
-  input: './adaptive-poisson-sampling.js',
+  input: './random-walks.js',
   output: [
     // UMD Build
     {
-      name: 'poisson',
+      name: 'randomWalks',
       file: 'index.js',
       format: 'umd',
       interop: false,
-    },    
+    },
   ],
 };
