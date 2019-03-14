@@ -18,12 +18,17 @@ let rng;
 let params = {
   // Parameters
   seed       : 1,
-  num_points : 50,
+  // num_points : 50,
+  num_points : 500,
   jitter     : 0,
-  algorithm  : "random",
+  min_step   : 5,
+  max_step   : 50,
+  mu         : 1,
+  algorithm  : "levyFlight",
 
   algorithms : [
-    "random"
+    "random",
+    "levyFlight"
   ],
 };
 
@@ -42,8 +47,11 @@ function setUpGui() {
   let gui = new dat.GUI();
 
   gui.add(params, "seed", 1, 5, 1).name("RNG Seed").onChange(createAndRender);
-  gui.add(params, "num_points", 1, 1000, 1).name("Num Points").onChange(createAndRender);
+  gui.add(params, "num_points", 1, 10000, 1).name("Num Points").onChange(createAndRender);
   gui.add(params, "jitter", 0, 20, 1).name("Point Jitter").onChange(createAndRender);
+  gui.add(params, "min_step", 1, 20, 1).name("Min Step").onChange(createAndRender);
+  gui.add(params, "max_step", 10, 10000, 10).name("Max Step").onChange(createAndRender);
+  gui.add(params, "mu", 0.5, 3, 0.1).name("Mu").onChange(createAndRender);
   gui.add(params, "algorithm", params.algorithms).name("Algorithm").onChange(createAndRender);
 }
 
@@ -55,7 +63,13 @@ function createAndRender() {
 
 function create() {
   const algorithm = randomWalks[params.algorithm];
-  points = algorithm(bbox, params.num_points, rng);
+  const options = {
+    min_step : params.min_step,
+    max_step : params.max_step,
+    mu       : params.mu
+  };
+
+  points = algorithm(bbox, params.num_points, rng, options);
 
   // Apply jitter
   points = points.map(vec => {
