@@ -7,15 +7,19 @@
   // Algorithm Sources
   // http://www.complexity-explorables.org/explorables/levy/
 
-  function levyFlight(dimensions, num_points=10, rng=Math.random) {
-    const seed_point = rngInBox(dimensions, rng);
+  function random(dimensions, num_points, rng) {
+    return randomWalk(dimensions, num_points, rngInBox, rng)
+  }
+
+  function randomWalk(dimensions, num_points, pointFn, rng=Math.random) {
+    const seed_point = pointFn(null, dimensions, rng);
 
     let out_points = [seed_point];
     let last_point = seed_point;
     let next_point = null;
 
     while (num_points > 1) {
-      next_point = nextPoint(last_point, dimensions, rng);
+      next_point = pointFn(last_point, dimensions, rng);
       out_points.push(next_point);
       last_point = next_point;
 
@@ -25,17 +29,17 @@
     return out_points;
   }
 
-  function rngInBox(bbox, rng) {
+  function rngInBox(prev, bbox, rng) {
     return [
       rng() * bbox[0],
       rng() * bbox[1]
     ];
   }
 
-  function nextPoint(prev, bbox, rng) {
-    return rngInBox(bbox, rng);
-  }
+  var randomWalks = {
+    random
+  };
 
-  return levyFlight;
+  return randomWalks;
 
 }));
