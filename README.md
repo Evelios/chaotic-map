@@ -1,3 +1,5 @@
+# TODO: Documentation!
+
 # adaptive-poisson-sampling
 
 This is a library to do 2D blue noise. 2D blue noise is an alternative to
