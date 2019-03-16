@@ -5,7 +5,7 @@ This is a javascript library for using different types of random walks. A random
 [**Take it for a test drive!**](https://evelios.github.io/random-walks/example.html)
 
 
-[![Example Image](example.PNG)](https://evelios.github.io/random-walks/example.html)
+[![Example Image](example.png)](https://evelios.github.io/random-walks/example.html)
 
 ## Instilation
 
