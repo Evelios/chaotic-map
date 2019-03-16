@@ -74,10 +74,11 @@ function create() {
   const options = {
     min_step : params.min_step,
     max_step : params.max_step,
-    mu       : params.mu
+    mu       : params.mu,
+    rng      : rng
   };
 
-  points = algorithm(bbox, params.num_points, rng, options);
+  points = algorithm(bbox, params.num_points, options);
 
   // Apply jitter
   points = points.map(vec => {
