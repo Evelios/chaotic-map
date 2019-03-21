@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: random-walks.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: random-walks.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// Algorithm Sources
+// http://www.complexity-explorables.org/explorables/levy/
+
+// -- Type Declerations --------------------------------------------------------
+
+/**
+ * @typedef Point {number[]} - Two element list of x and y coordinates
+ *//**
+ * @typedef Rectangle {number[]} - Two element list of width and height
+ *//**
+ * @typedef Random {Function} A pseudo random number generator
+ * @returns {number} A number from 0 to 1
+ *//**
+ * Get a random location within a bounded box
+ * @typedef randomInBox {Function}
+ * @param {Rectangle} bounding_box
+ * @param {Random}    rng
+ *
+ * @returns {Point} The chose point withing the bounding box
+ */
+
+// -- Module Declerations ------------------------------------------------------
+
+/**
+ * @param {number[]} dimensions
+ * @param {number} num_points
+ * @param {Object} opts.rng
+ */
+function random(dimensions, num_points, opts) {
+  const seed_point = rngInBox(dimensions, opts.rng);
+
+  return randomWalk(dimensions, seed_point, num_points, rngInBox, opts)
+}
+
+/**
+ * @param {number[]} dimensions
+ * @param {number} num_points
+ * @param {Object} opts
+ * @param {number} opts.max_step
+ * @param {number} opts.min_step
+ * @param {number} opts.mu
+ * @param {number} opts.rng
+ * }
+ */
+function levyFlight(dimensions, num_iterations, opts) {
+  const next_point = function (prev, rng) {
+    const p_density    = r => 1 / Math.pow(r, 1 + opts.mu);
+    // Clamp to the 0 - 1 range. Magic constant here
+    const step_percent = Math.max(1, p_density(rng()) / 1000000);
+    const step_len     = lerp(opts.min_step, opts.max_step, step_percent);
+    const offset_point = offset(prev, step_len, rng);
+
+    return inBox(dimensions, offset_point)
+      ? offset_point
+      : rngInBox(dimensions, opts.rng);
+  };
+
+  return randomWalk({
+    // num_walkers,
+    dimensions,
+    nextPoint,
+    startingPoint  : rngInBox,
+    num_iterations : num_points,
+    bbox           : dimensions,
+    rng            : opts.rng
+  });
+}
+
+// -- Base Module --------------------------------------------------------------
+
+/**
+ * @typedef randomIteration {Function}
+ * @param {Point} prev_point The last point that was iterated on
+ * @param {Random} rng the input random number generator
+ */
+
+/**
+ * @param {Object} opts                     All the options
+ * @param {number} opts.num_iterations      The number of steps in a single walk
+ * @param {number} opts.num_walkers         Number of times to run the random walk
+ * @param {Rectangle} opts.bbox             The bounding box for the algorithm
+ * @param {randomInBox} opts.startingPoint  The function that chooses the starting
+ *                                          location for the random walk
+ * @param {randomIteration} opts.nextPoint  The function that chooses where the next point
+ *                                          is places based on the previous point
+ * @param {Random} opts.rng                 The pseudo random number generator
+ *
+ * @returns {Point[]} The list of points from the random walk
+ */
+function randomWalk(opts) {
+  const density_fn = density instanceof Function ? density : () => density;
+  const [width, height] = opts.dimensions;
+  const seed_point = opts.startingPoint(opts.bbox);
+
+  let num_points = 0;
+  let out_points = [seed_point];
+  let last_point = seed_point;
+  let next_point = null;
+
+  while (num_points &lt; opts.num_iterations) {
+    next_point = pointFn(last_point, opts.rng);
+    if (!inBox(next_point)) {
+      next_point = opts.startingPoint(opts.bbox);
+    }
+    out_points.push(next_point);
+    last_point = next_point;
+
+    num_points++;
+  }
+
+  return out_points;
+}
+
+// -- Helper Functions ---------------------------------------------------------
+
+function rngInBox(bbox, rng) {
+  return [
+    rng() * bbox[0],
+    rng() * bbox[1]
+  ];
+}
+
+function inBox(bbox, point) {
+  return point[0] > 0 &amp;&amp; point[0] &lt; bbox[0] &amp;&amp;
+         point[1] > 0 &amp;&amp; point[1] &lt; bbox[1];
+}
+
+function lerp(v0, v1, t) {
+  return v0 * (1-t) + v1 * t;
+}
+
+function offset(vec, r, rng) {
+  const angle = 2*Math.PI * rng();
+
+  return [
+    vec[0] + Math.cos(angle) * r,
+    vec[1] + Math.sin(angle) * r
+  ];
+}
+
+// -- Module Exports -----------------------------------------------------------
+
+export default {
+  random,
+  levyFlight
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#levyFlight">levyFlight</a></li><li><a href="global.html#random">random</a></li><li><a href="global.html#randomWalk">randomWalk</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Mar 21 2019 17:36:17 GMT-0400 (EDT)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
