@@ -9,6 +9,7 @@ let params = {
   num_points  : 3000,
   jitter      : 0,
   draw_colors : false,
+  opacity     : 1,
   algorithm   : "random",
 
   algorithms : [
@@ -102,7 +103,8 @@ function setUpGuiGeneral(gui) {
   general_gui.add(params, "num_walkers", 1, 5, 1).name("Num Walkers").onChange(createAndRender);
   general_gui.add(params, "num_points", 1, 100000, 1).name("Num Points").onChange(createAndRender);
   general_gui.add(params, "jitter", 0, 20, 1).name("Point Jitter").onChange(createAndRender);
-  general_gui.add(params, "draw_colors").name("Draw Colors").onChange(createAndRender);
+  general_gui.add(params, "draw_colors").name("Draw Colors").onChange(render);
+  general_gui.add(params, "opacity", 0, 1, 0.05).name("Opacity").onChange(render);
   general_gui.add(params, "algorithm", params.algorithms).name("Algorithm").onChange(guiAndCreateAndRender);
 }
 
@@ -163,17 +165,17 @@ function create() {
 }
 
 function render() {
-  background(bgColor.toHexString());
+  background(bgColor.toHex8String());
 
   // Draw all the points
   noStroke();
-  fill(point_colors[0].toHexString());
+  fill(point_colors[0].setAlpha(params.opacity).toHex8String());
   points.forEach((point, i, points) => {
 
     if (params.draw_colors) {
       const position_percent = i / points.length;
       const point_color = lerpColors(position_percent, point_colors);
-      fill(point_color.toHexString());
+      fill(point_color.setAlpha(params.opacity).toHex8String());
     }
 
     const ellipse_size = 5;

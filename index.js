@@ -110,7 +110,6 @@
     let total_walks  = 0;
     let out_points   = [];
 
-
     while (total_walks < opts.num_walkers) {
       let seed_point = opts.startingPoint(opts.bbox, opts.rng);
       let num_points = 0;
