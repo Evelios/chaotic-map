@@ -40,13 +40,12 @@
     };
 
     return randomWalk({
-      // num_walkers,
       dimensions,
       nextPoint,
       startingPoint  : rngInBox,
       num_iterations : num_points,
-      num_walkers    : 1,
       bbox           : dimensions,
+      num_walkers    : opts.num_walkers,
       rng            : opts.rng
     });
   }
@@ -75,13 +74,12 @@
     };
 
     return randomWalk({
-      // num_walkers,
       dimensions,
       nextPoint,
       startingPoint  : rngInBox,
       num_iterations : num_points,
-      num_walkers    : 1,
       bbox           : dimensions,
+      num_walkers    : opts.num_walkers,
       rng            : opts.rng
     });
   }
@@ -109,12 +107,16 @@
    */
   function randomWalk(opts) {
     const seed_point = opts.startingPoint(opts.bbox, opts.rng);
-    let num_points   = 0;
     let total_walks  = 0;
-    let out_points   = [seed_point];
-    let last_point   = seed_point;
+    let out_points   = [];
+
 
     while (total_walks < opts.num_walkers) {
+      let seed_point = opts.startingPoint(opts.bbox, opts.rng);
+      let num_points = 0;
+      let last_point = seed_point;
+      out_points.push(seed_point);
+
       while (num_points < opts.num_iterations) {
         let next_point = opts.nextPoint(last_point, opts.rng);
         if (!inBox(opts.dimensions, next_point)) {
@@ -125,6 +127,7 @@
 
         num_points++;
       }
+
       total_walks++;
     }
 

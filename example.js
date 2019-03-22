@@ -5,6 +5,7 @@ let params = {
 
   // Global Parameters
   seed        : 1,
+  num_walkers : 1,
   num_points  : 3000,
   jitter      : 0,
   draw_colors : false,
@@ -98,7 +99,8 @@ function setUpGuiGeneral(gui) {
 
   // This can probably be tamed down a bit and pulled into a wrapper function
   general_gui.add(params, "seed", 1, 5, 1).name("RNG Seed").onChange(createAndRender);
-  general_gui.add(params, "num_points", 1, 10000, 1).name("Num Points").onChange(createAndRender);
+  general_gui.add(params, "num_walkers", 1, 5, 1).name("Num Walkers").onChange(createAndRender);
+  general_gui.add(params, "num_points", 1, 100000, 1).name("Num Points").onChange(createAndRender);
   general_gui.add(params, "jitter", 0, 20, 1).name("Point Jitter").onChange(createAndRender);
   general_gui.add(params, "draw_colors").name("Draw Colors").onChange(createAndRender);
   general_gui.add(params, "algorithm", params.algorithms).name("Algorithm").onChange(guiAndCreateAndRender);
@@ -108,7 +110,7 @@ function setUpGuiRandom(gui) {
   random_gui = gui.addFolder('Random Module');
   random_gui.open();
 
-  random_gui.add(params.random, "step", 5, 50, 1).name("Step Size").onChange(createAndRender);
+  random_gui.add(params.random, "step", 1, 20, 0.5).name("Step Size").onChange(createAndRender);
 }
 
 function setUpGuiLevi(gui) {
@@ -136,6 +138,7 @@ function create() {
   const algorithm = randomWalks[params.algorithm];
   const options = {
     // General
+    num_walkers : params.num_walkers,
     rng : rng,
 
     // Random
