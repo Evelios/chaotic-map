@@ -1,5 +1,33 @@
 "use strict";
 
+// User Parameters
+let params = {
+
+  // Global Parameters
+  seed        : 1,
+  num_points  : 3000,
+  jitter      : 0,
+  draw_colors : false,
+  algorithm   : "random",
+
+  algorithms : [
+    "random",
+    "levyFlight"
+  ],
+
+  // Random Module Parameters
+  random : {
+    step : 5
+  },
+
+  // Levey Flight Parameters
+  levy : {
+    min_step : 5,
+    max_step : 20,
+    mu       : 1,
+  }
+};
+
 // Colors
 const bgColor         = tinycolor("#303030");
 const bgAccent        = tinycolor("#393939");
@@ -21,23 +49,9 @@ let height;
 let bbox;
 let points;
 let rng;
-
-let params = {
-  // Parameters
-  seed        : 1,
-  num_points  : 3000,
-  jitter      : 0,
-  min_step    : 5,
-  max_step    : 20,
-  mu          : 1,
-  draw_colors : false,
-  algorithm   : "levyFlight",
-
-  algorithms : [
-    "random",
-    "levyFlight"
-  ],
-};
+let gui;
+let random_gui;
+let levy_gui;
 
 function setup() {
   width  = document.body.clientWidth  || window.innerWidth;
@@ -51,16 +65,65 @@ function setup() {
 }
 
 function setUpGui() {
-  let gui = new dat.GUI();
+  if (!gui) {
+    gui = new dat.GUI();
+    setUpGuiGeneral(gui); 
+  }
+  else {
+    cleanupGuiFolders(gui);
+  }
 
-  gui.add(params, "seed", 1, 5, 1).name("RNG Seed").onChange(createAndRender);
-  gui.add(params, "num_points", 1, 10000, 1).name("Num Points").onChange(createAndRender);
-  gui.add(params, "jitter", 0, 20, 1).name("Point Jitter").onChange(createAndRender);
-  gui.add(params, "min_step", 1, 20, 1).name("Min Step").onChange(createAndRender);
-  gui.add(params, "max_step", 5, 50, 5).name("Max Step").onChange(createAndRender);
-  gui.add(params, "mu", 0.5, 3, 0.1).name("Mu").onChange(createAndRender);
-  gui.add(params, "draw_colors").name("Draw Colors").onChange(createAndRender);
-  gui.add(params, "algorithm", params.algorithms).name("Algorithm").onChange(createAndRender);
+  if (params.algorithm == "random") {
+    setUpGuiRandom(gui);
+  }
+  else if (params.algorithm == "levyFlight") {
+    setUpGuiLevi(gui);
+  }
+}
+
+function cleanupGuiFolders(gui) {
+  if (levy_gui) {
+    gui.removeFolder(levy_gui);
+    levy_gui = undefined;
+  }
+  else if (random_gui) {
+    gui.removeFolder(random_gui);
+    random_gui = undefined;
+  }
+}
+
+function setUpGuiGeneral(gui) {
+  const general_gui = gui.addFolder('General');
+  general_gui.open();
+
+  // This can probably be tamed down a bit and pulled into a wrapper function
+  general_gui.add(params, "seed", 1, 5, 1).name("RNG Seed").onChange(createAndRender);
+  general_gui.add(params, "num_points", 1, 10000, 1).name("Num Points").onChange(createAndRender);
+  general_gui.add(params, "jitter", 0, 20, 1).name("Point Jitter").onChange(createAndRender);
+  general_gui.add(params, "draw_colors").name("Draw Colors").onChange(createAndRender);
+  general_gui.add(params, "algorithm", params.algorithms).name("Algorithm").onChange(guiAndCreateAndRender);
+}
+
+function setUpGuiRandom(gui) {
+  random_gui = gui.addFolder('Random Module');
+  random_gui.open();
+
+  random_gui.add(params.random, "step", 5, 50, 1).name("Step Size").onChange(createAndRender);
+}
+
+function setUpGuiLevi(gui) {
+  console.log(levy_gui);
+  levy_gui = gui.addFolder('Levy Flight');
+  levy_gui.open();
+
+  levy_gui.add(params.levy, "min_step", 1, 20, 1).name("Min Step").onChange(createAndRender);
+  levy_gui.add(params.levy, "max_step", 5, 50, 5).name("Max Step").onChange(createAndRender);
+  levy_gui.add(params.levy, "mu", 0.5, 3, 0.1).name("Mu").onChange(createAndRender);
+}
+
+function guiAndCreateAndRender() {
+  setUpGui();
+  createAndRender();
 }
 
 function createAndRender() {
@@ -72,10 +135,16 @@ function createAndRender() {
 function create() {
   const algorithm = randomWalks[params.algorithm];
   const options = {
-    min_step : params.min_step,
-    max_step : params.max_step,
-    mu       : params.mu,
-    rng      : rng
+    // General
+    rng : rng,
+
+    // Random
+    step : params.random.step,
+    
+    // Levy
+    min_step : params.levy.min_step,
+    max_step : params.levy.max_step,
+    mu       : params.levy.mu,
   };
 
   points = algorithm(bbox, params.num_points, options);
@@ -108,7 +177,6 @@ function render() {
     ellipse(point[0], point[1], ellipse_size);
   });
 }
-
 
 function lerpColors(percent, colors) {
   const num_colors   = colors.length;

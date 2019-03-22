@@ -24,12 +24,25 @@
 /**
  * @param {number[]} dimensions
  * @param {number} num_points
- * @param {Object} opts.rng
+ * @param {Object} opts
+ * @param {number} opts.step
+ * @param {number} opts.rng
  */
 function random(dimensions, num_points, opts) {
-  const seed_point = rngInBox(dimensions, opts.rng);
+  const nextPoint = function(prev, rng) {
+    return offset(prev, opts.step, rng);
+  };
 
-  return randomWalk(dimensions, seed_point, num_points, rngInBox, opts)
+  return randomWalk({
+    // num_walkers,
+    dimensions,
+    nextPoint,
+    startingPoint  : rngInBox,
+    num_iterations : num_points,
+    num_walkers    : 1,
+    bbox           : dimensions,
+    rng            : opts.rng
+  });
 }
 
 /**
@@ -43,12 +56,12 @@ function random(dimensions, num_points, opts) {
  * }
  */
 function levyFlight(dimensions, num_points, opts) {
-  const nextPoint = function (prev, rng) {
+  const nextPoint = function(prev, rng) {
     const p_density    = r => 1 / Math.pow(r, 1 + opts.mu);
     // Clamp to the 0 - 1 range. Magic constant here
-    const step_percent = Math.max(1, p_density(rng()) / 1000000);
+    const step_percent = Math.max(1, p_density(opts.rng()) / 1000000);
     const step_len     = lerp(opts.min_step, opts.max_step, step_percent);
-    const offset_point = offset(prev, step_len, rng);
+    const offset_point = offset(prev, step_len, opts.rng);
 
     return inBox(dimensions, offset_point)
       ? offset_point
@@ -99,7 +112,7 @@ function randomWalk(opts) {
     while (num_points < opts.num_iterations) {
       let next_point = opts.nextPoint(last_point, opts.rng);
       if (!inBox(opts.dimensions, next_point)) {
-        next_point = opts.startingPoint(opts.bbox);
+        next_point = opts.startingPoint(opts.bbox, opts.rng);
       }
       out_points.push(next_point);
       last_point = next_point;
@@ -130,12 +143,27 @@ function lerp(v0, v1, t) {
   return v0 * (1-t) + v1 * t;
 }
 
+// ---- Vectors ----
+
 function offset(vec, r, rng) {
   const angle = 2*Math.PI * rng();
-
   return [
     vec[0] + Math.cos(angle) * r,
     vec[1] + Math.sin(angle) * r
+  ];
+}
+
+function add(v1, v2) {
+  return [
+    v1[0] + v2[0],
+    v1[1] + v2[1]
+  ];
+}
+
+function polar(r, theta) {
+  return [
+    r *  Math.cos(theta),
+    r * -Math.sin(theta)
   ];
 }
 
