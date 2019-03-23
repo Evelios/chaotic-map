@@ -36,11 +36,11 @@ function random(dimensions, num_points, opts) {
   return randomWalk({
     dimensions,
     nextPoint,
-    startingPoint  : rngInBox,
-    num_iterations : num_points,
-    bbox           : dimensions,
+    startingPoint  : opts.startingPoint || rngInBox,
     num_walkers    : opts.num_walkers,
     rng            : opts.rng
+    num_iterations : num_points,
+    bbox           : dimensions,
   });
 }
 
@@ -56,10 +56,8 @@ function random(dimensions, num_points, opts) {
  */
 function levyFlight(dimensions, num_points, opts) {
   const nextPoint = function(prev, rng) {
-    const p_density    = r => 1 / Math.pow(r, 1 + opts.mu);
-    // Clamp to the 0 - 1 range. Magic constant here
-    const step_percent = Math.max(1, p_density(opts.rng()) / 1000000);
-    const step_len     = lerp(opts.min_step, opts.max_step, step_percent);
+    const p_density    = r => 1 / Math.pow(r, 1/opts.mu);
+    const step_len     = Math.max(opts.max_step, p_density(opts.rng()));
     const offset_point = offset(prev, step_len, opts.rng);
 
     return inBox(dimensions, offset_point)
@@ -70,7 +68,7 @@ function levyFlight(dimensions, num_points, opts) {
   return randomWalk({
     dimensions,
     nextPoint,
-    startingPoint  : rngInBox,
+    startingPoint  : opts.startingPoint || rngInBox,
     num_iterations : num_points,
     bbox           : dimensions,
     num_walkers    : opts.num_walkers,

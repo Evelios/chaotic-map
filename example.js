@@ -10,12 +10,33 @@ let params = {
   jitter      : 0,
   draw_colors : false,
   opacity     : 1,
-  algorithm   : "random",
 
-  algorithms : [
+  algorithm   : "random",
+  algorithms  : [
     "random",
     "levyFlight"
   ],
+
+  start_location  : "Random",
+  start_locations : [
+    "Random",
+    "Center",
+    "Edge"
+  ],
+
+  start_functions : {
+    "Random" : (bbox, rng) => [ rng() * bbox[0], rng() * bbox[1] ],
+    "Center" : (bbox, rng) => [ bbox[0]/2, bbox[1]/2 ],
+    "Edge"   : (bbox, rng) => {
+      const edges = [
+        () => [0               , bbox[1] * rng()],
+        () => [bbox[0]         , bbox[1] * rng()],
+        () => [bbox[0] * rng() , 0              ],
+        () => [bbox[0] * rng() , bbox[1]        ],
+      ];
+      return edges[Math.floor(rng() * edges.length)]();
+    },
+  },
 
   // Random Module Parameters
   random : {
@@ -105,6 +126,7 @@ function setUpGuiGeneral(gui) {
   general_gui.add(params, "jitter", 0, 20, 1).name("Point Jitter").onChange(createAndRender);
   general_gui.add(params, "draw_colors").name("Draw Colors").onChange(render);
   general_gui.add(params, "opacity", 0, 1, 0.05).name("Opacity").onChange(render);
+  general_gui.add(params, "start_location", params.start_locations).name("Starting Locations").onChange(createAndRender);
   general_gui.add(params, "algorithm", params.algorithms).name("Algorithm").onChange(guiAndCreateAndRender);
 }
 
@@ -138,8 +160,10 @@ function createAndRender() {
 
 function create() {
   const algorithm = randomWalks[params.algorithm];
+  const startLocation = params.start_functions[params.start_location];
   const options = {
     // General
+    startingPoint : startLocation,
     num_walkers : params.num_walkers,
     rng : rng,
 
