@@ -8,11 +8,11 @@ const plugins = [
 
 export default {
   plugins,
-  input: './random-walks.js',
+  input: './chaotic-map.js',
   output: [
     // UMD Build
     {
-      name: 'randomWalks',
+      name: 'chaoticMap',
       file: 'index.js',
       format: 'umd',
       interop: false,

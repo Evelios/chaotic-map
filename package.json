@@ -1,7 +1,7 @@
 {
-  "name": "random-walks",
+  "name": "chaotic-map",
   "version": "1.1.0",
-  "description": "A visualization of random walks",
+  "description": "An exploration onto some strange attractors",
   "main": "index.js",
   "dependencies": {
     "rbush": "^2.0.2",
@@ -17,19 +17,18 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Evelios/random-walks"
+    "url": "https://github.com/Evelios/chaotic-map"
   },
   "keywords": [
-    "poisson",
-    "blue-noise",
-    "noise",
-    "2d",
-    "geometry"
+    "chaos",
+    "dynamical system",
+    "strange attractor",
+    "map"
   ],
   "author": "Thomas Waters",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Evelios/random-walks/issues"
+    "url": "https://github.com/Evelios/chaotic-map/issues"
   },
-  "homepage": "https://github.com/Evelios/random-walks#readme"
+  "homepage": "https://github.com/Evelios/chaotic-map#readme"
 }
